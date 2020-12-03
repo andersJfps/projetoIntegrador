@@ -11,8 +11,38 @@
 </head>
 <body>
 
-    <h1>Index de Tipo Produto</h1>
 
+
+
+    <div class="container">
+        
+        <a href={{route('tipoproduto.create')}} class="btn btn-primary">Criar Tipo de Produto</a>
+
+        <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Descrição</th>
+                <th scope="col">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+                {{-- Coleção: a coleção que está sendo recebida, no caso $TipoProdutos --}}
+                @foreach ($tipoProdutos as $tipoProduto)
+                    <tr>
+                        <th scope="row">{{$tipoProduto->id}}</th>
+                        <td>{{$tipoProduto->descricao}}</td>
+                        <td>
+                            <a href="#" class="btn btn-primary">Show</a>
+                            <a href="#" class="btn btn-info">Edit</a>
+                            <a href="#" class="btn btn-danger">Delete</a>
+                        </td>
+                    <tr>
+                @endforeach
+    
+            </tbody>
+        </table>
+    </div>
 
 
 
