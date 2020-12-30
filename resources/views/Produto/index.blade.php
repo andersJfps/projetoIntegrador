@@ -9,14 +9,17 @@
 </head>
 <body>
 
+
     <div class="container">
+        <a href={{route('produto.create')}} class="btn btn-primary">Cadastrar Produto</a>
         <table class="table table-hover">
             <thead>
               <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Nome</th>
                 <th scope="col">Preço</th>
-                <th scope="col">ID Tipo Produto</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -26,7 +29,12 @@
                 <th scope="row">{{$produto->id}}</th>
                 <td>{{$produto->nome}}</td>
                 <td>{{$produto->preco}}</td>
-                <td>{{$produto->Tipo_Produtos_id}}</td>
+                <td>{{$produto->descricao}}</td>
+                <td>
+                    <a href={{route('produto.show', $produto->id)}} class="btn btn-primary">Show</a>
+                    <a href="#" class="btn btn-info">Edit</a>
+                    <a href="#" class="btn btn-danger">Delete</a>
+                </td>
                 </tr>
                 </tr>
               @endforeach

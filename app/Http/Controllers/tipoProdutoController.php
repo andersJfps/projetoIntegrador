@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TipoProduto;
+use App\Models\Produto;
 use DB;
 
 
@@ -40,11 +41,11 @@ class tipoProdutoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    { 
         $tipoProduto = new TipoProduto();
         $tipoProduto->descricao = $request->descricao;
         $tipoProduto->save();
-        return view('TipoProduto.create');
+        return $this->index();
     }
 
     /**
@@ -55,8 +56,14 @@ class tipoProdutoController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $tipoProduto = TipoProduto::find($id);
+        if(isset($tipoProduto))
+            return view('TipoProduto.show')->with('tipoProduto', $tipoProduto);
+        
+        // #TODO Ajustar tela de erro
+        return 'Não encontrado';
+    }   
 
     /**
      * Show the form for editing the specified resource.
@@ -66,7 +73,15 @@ class tipoProdutoController extends Controller
      */
     public function edit($id)
     {
-        //
+        
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $tipoProduto = TipoProduto::find($id);
+        if(isset($tipoProduto))
+            return view('TipoProduto.edit')->with('tipoProduto', $tipoProduto);
+        
+        // #TODO Ajustar tela de erro
+        return 'Não encontrado';
+
     }
 
     /**
@@ -78,7 +93,16 @@ class tipoProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $tipoProduto = TipoProduto::find($id);
+        if(isset($tipoProduto)){
+            $tipoProduto->descricao = $request->descricao;
+            $tipoProduto->update();
+            return $this->index();
+        }
+        // #TODO Ajustar tela de erro
+        return 'Não encontrado';
     }
 
     /**
