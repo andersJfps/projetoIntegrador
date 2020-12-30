@@ -35,16 +35,60 @@
                         <td>
                             <a href={{route('tipoproduto.show', $tipoProduto->id )}} class="btn btn-primary">Show</a>
                             <a href={{route('tipoproduto.edit', $tipoProduto->id )}} class="btn btn-info">Edit</a>
-                            <a href="#" class="btn btn-danger">Delete</a>
+                            <a href="#" class="btn btn-danger destroyButton"  data-toggle="modal" data-target="#exampleModal" value={{route('tipoproduto.destroy', $tipoProduto->id )}}>Delete</a>
                         </td>
                     <tr>
                 @endforeach
     
             </tbody>
         </table>
+
+                  
+
+         <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Remover recurso</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> 
+                </div>
+                <div class="modal-body">
+                    Deseja remover este recurso?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+                <form id="destroyForm" method="POST" action="">
+                    @csrf
+                    <input name="_method" type="hidden" value="DELETE">
+
+                    <input class="btn btn-danger" type="submit" value="Confirmar">
+
+                </form>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        
+        const destroyButtons = document.querySelectorAll(".destroyButton");
+        const destroyForm = document.querySelector("#destroyForm");
 
+        destroyButtons.forEach(destroyButton => {
+            destroyButton.addEventListener('click', configureAction);
+            
+        });
+
+        function configureAction(){
+            destroyForm.setAttribute('action', this.getAttribute('value'));
+        }
+
+    </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
