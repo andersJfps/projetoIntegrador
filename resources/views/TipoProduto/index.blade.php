@@ -10,12 +10,18 @@
     <title>Index de Tipo Produto</title>
 </head>
 <body>
-
-
-
-
     <div class="container">
-        
+        @if (isset($error))
+            <div class="alert alert-{{$error['type']}} alert-dismissible fade show" role="alert">
+                <strong> {{$error['message']}}. </strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+        @endif
+
+
         <a href={{route('tipoproduto.create')}} class="btn btn-primary">Criar Tipo de Produto</a>
 
         <table class="table table-hover">
@@ -35,6 +41,7 @@
                         <td>
                             <a href={{route('tipoproduto.show', $tipoProduto->id )}} class="btn btn-primary">Show</a>
                             <a href={{route('tipoproduto.edit', $tipoProduto->id )}} class="btn btn-info">Edit</a>
+                            
                             <a href="#" class="btn btn-danger destroyButton"  data-toggle="modal" data-target="#exampleModal" value={{route('tipoproduto.destroy', $tipoProduto->id )}}>Delete</a>
                         </td>
                     <tr>

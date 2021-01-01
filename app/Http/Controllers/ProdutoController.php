@@ -25,6 +25,16 @@ class ProdutoController extends Controller
         return view('Produto.index')->with('produtos', $produtos);
     }
 
+    private function indexError($error)
+    {
+
+        $produtos = DB::select("SELECT Produtos.id, Produtos.nome, Produtos.preco, Tipo_Produtos.descricao FROM produtos	
+        join Tipo_Produtos on produtos.Tipo_Produtos_id = Tipo_produtos.id ;");
+
+        return view('Produto.index')->with('produtos', $produtos)->with('error', $error);
+    }
+
+
     /**
      * Show the form for creating a new resource.
      *
@@ -93,7 +103,9 @@ class ProdutoController extends Controller
            
         
         // #TODO Ajustar tela de erro
-        return 'Não encontrado';
+        $error['type']      = 'danger';
+        $error['message']   = 'Recurso não encontrado';
+        return $this->indexError($error);   
 
     }
        
@@ -112,11 +124,22 @@ class ProdutoController extends Controller
             $produto->nome              = $request->nome;
             $produto->preco             = $request->preco;
             $produto->Tipo_Produtos_id  = $request->Tipo_Produtos_id;
-            $produto->update();
+
+
+            try {
+                $produto->update();
+            } catch (\Throwable $th) {
+                $error['type']      = 'danger';
+                $error['message']   = 'Problema ao atualizar um recurso';
+                return $this->indexError($error);
+            }
+
             return $this->index();
         }
 
-        return 'Não encontrado';
+        $error['type']      = 'danger';
+        $error['message']   = 'Recurso não encontrado   ';
+        return $this->indexError($error);
     }
 
     /**
@@ -126,7 +149,20 @@ class ProdutoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    {   
+
+        $produto = Produto::find($id);
+        if(isset($produto)){
+   
+            try {
+                $produto->delete();
+            } catch (\Throwable $th) {
+                $error['type']      = 'danger';
+                $error['message']   = 'Problema ao remover um recurso';
+                return $this->indexError($error);
+            }
+            return $this->index();
+        }
 
     }
 }
