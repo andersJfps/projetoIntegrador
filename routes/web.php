@@ -21,7 +21,7 @@ Route::get('/', function () {
 Route::resource('produto', 'App\http\Controllers\ProdutoController');
 
 Route::resource('tipoproduto', 'App\http\Controllers\TipoProdutoController');
-
+Route::get('pedido', 'App\http\Controllers\PedidoController@index')->name('pedido.index');
 
 
 

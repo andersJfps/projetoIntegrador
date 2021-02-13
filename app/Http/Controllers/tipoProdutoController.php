@@ -18,10 +18,7 @@ class tipoProdutoController extends Controller
      */
     public function index()
     {
-
-        // Buscar os dados que estão na tabela Tipo_Produtos
-        $tipoProdutos = DB::select('select * from Tipo_Produtos');
-        return view('TipoProduto.index')->with('tipoProdutos',$tipoProdutos);
+        return $this->indexMessage(null);
     }
 
 
@@ -30,12 +27,11 @@ class tipoProdutoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    private function indexError($error)
+    private function indexMessage($message)
     {
-
         // Buscar os dados que estão na tabela Tipo_Produtos
         $tipoProdutos = DB::select('select * from Tipo_Produtos');
-        return view('TipoProduto.index')->with('tipoProdutos',$tipoProdutos)->with('error', $error);
+        return view('TipoProduto.index')->with('tipoProdutos',$tipoProdutos)->with('message', $message);
     }
 
 
@@ -63,13 +59,15 @@ class tipoProdutoController extends Controller
         try {
             $tipoProduto->save();
         } catch (\Throwable $th) {
-            $error['type']      = 'danger';
-            $error['message']   = 'Problema ao salvar um recurso';
-            return $this->indexError($error);
+            $message['type']      = 'danger';
+            $message['message']   = 'Problema ao salvar um recurso';
+            return $this->indexMessage($message);
         }
-
-       
-        return $this->index();
+        // Constrói a mensagem de sucesso.
+        $message['type']      = 'success';
+        $message['message']   = 'Recurso salvo com sucesso';
+        // Retorna para a view index
+        return $this->indexMessage($message);
     }
 
     /**
@@ -85,9 +83,9 @@ class tipoProdutoController extends Controller
         if(isset($tipoProduto))
             return view('TipoProduto.show')->with('tipoProduto', $tipoProduto);
         
-        $error['type']      = 'danger';
-        $error['message']   = 'Recurso não encontrado';
-        return $this->indexError($error);
+        $message['type']      = 'danger';
+        $message['message']   = 'Recurso não encontrado';
+        return $this->indexMessage($message);
     }   
 
     /**
@@ -105,9 +103,9 @@ class tipoProdutoController extends Controller
             return view('TipoProduto.edit')->with('tipoProduto', $tipoProduto);
         
         // #TODO Ajustar tela de erro
-        $error['type']      = 'danger';
-        $error['message']   = 'Recurso não encontrado';
-        return $this->indexError($error);
+        $message['type']      = 'danger';
+        $message['message']   = 'Recurso não encontrado';
+        return $this->indexMessage($message);
 
     }
 
@@ -129,15 +127,19 @@ class tipoProdutoController extends Controller
             try {
                 $tipoProduto->update();
             } catch (\Throwable $th) {
-                $error['type']      = 'danger';
-                $error['message']   = 'Problema ao atualizar um recurso';
-                return $this->indexError($error);
+                $message['type']      = 'danger';
+                $message['message']   = 'Problema ao atualizar um recurso';
+                return $this->indexMessage($message);
             }
-            return $this->index();
+            // Constrói a mensagem de sucesso.
+            $message['type']      = 'success';
+            $message['message']   = 'Recurso atualizado com sucesso';
+            // Retorna para a view index
+            return $this->indexMessage($message);
         }   
-        $error['type']      = 'danger';
-        $error['message']   = 'Recurso não encontrado   ';
-        return $this->indexError($error);
+        $message['type']      = 'danger';
+        $message['message']   = 'Recurso não encontrado   ';
+        return $this->indexMessage($message);
        
     }
 
@@ -155,12 +157,19 @@ class tipoProdutoController extends Controller
             try {
                 $tipoProduto->delete();
             } catch (\Throwable $th) {
-                $error['type']      = 'danger';
-                $error['message']   = 'Problema ao remover um recurso';
-                return $this->indexError($error);
+                $message['type']      = 'danger';
+                $message['message']   = 'Problema ao remover um recurso';
+                return $this->indexMessage($message);
             }
-            return $this->index();
+            // Constrói a mensagem de sucesso.
+            $message['type']      = 'success';
+            $message['message']   = 'Recurso removido com sucesso';
+            // Retorna para a view index
+            return $this->indexMessage($message);
         }
+        $message['type']      = 'danger';
+        $message['message']   = 'Recurso não encontrado   ';
+        return $this->indexMessage($message);
        
     }
 }
