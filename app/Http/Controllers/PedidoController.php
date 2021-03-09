@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pedido;
-use DB;
+use DB;     
+use App\Models\TipoProduto;
+use App\Models\Produto;
+use App\Models\Endereco;
+use App\Models\PedidoProduto;
+use Carbon\Carbon;
 
 class PedidoController extends Controller
 {
@@ -15,9 +20,74 @@ class PedidoController extends Controller
      */
     public function index()
     {
+        //#TODO selecionar id de usuario com base no que está logado.
+        $user_id = 1;
+
+        // Buscar os dados que estão na tabela Pedidos
+        $pedidos = Pedido::where('Users_id', $user_id)->orderBy('Pedidos.id', 'DESC')->get();
+        
+
+        // Buscar os dados que estão na tabela Tipo_Produtos
+        $tipoProdutos = TipoProduto::all();
+        
+        // Buscar os produtos do primeiro tipo encontrado
+        $produtos = [];
+        if( !$tipoProdutos->isEmpty()){
+            $firstTipoProduto = $tipoProdutos->first();
+            // Buscar o produto com determinado id
+            $produtos = Produto::where('Tipo_Produtos_id', $firstTipoProduto->id)->get();
+        }
+
+        // Buscar os endereço do usuario logado
+        $enderecos = DB::select('select * from Enderecos where Users_id = ?', [$user_id]);
+
+        // Buscar os produtos dentro do ultimo pedido
+        $produtosPedido = [];
+        $totalPedido = 0;
+        $estado = "";
+        if( !$pedidos->isEmpty()){
+            $ultimoPedidoRealizado = $pedidos->first();
+
+             // Buscar os produtos dentro de um determinado pedido
+             $produtosPedido = DB::select("select Pedido_Produtos.Pedidos_id,  Pedido_Produtos.Produtos_id, Pedido_Produtos.quantidade, Produtos.nome, Tipo_Produtos.descricao from Pedido_Produtos
+             join Produtos on Pedido_Produtos.Produtos_id = Produtos.id
+             join Tipo_Produtos on Produtos.Tipo_Produtos_id = Tipo_Produtos.id
+             where Pedido_Produtos.Pedidos_id = ?", [$ultimoPedidoRealizado->id]);
+
+            //Calcula o total de R$ do pedido
+            if(!empty($produtosPedido)){
+                $totalPedido = DB::select("select sum(Pedido_Produtos.quantidade * Produtos.preco) as total_pedido from Pedido_Produtos
+                join Produtos on Pedido_Produtos.Produtos_id = Produtos.id
+                where Pedido_Produtos.Pedidos_id = ?", [$ultimoPedidoRealizado->id])[0];
+                $totalPedido = $totalPedido->total_pedido;
+            }
+
+            //Verifica o estado do pedido e envia para view
+            switch ($ultimoPedidoRealizado->status) {
+                case 'R':
+                    $estado ="Recebido";
+                    break;
+                
+                case 'C':
+                    $estado ="Cancelado";
+                    break;
+                case 'P':
+                    $estado ="Produção";
+                    break;
+
+                case 'E':
+                    $estado ="Enviado";
+                    break;
+
+                case 'A':
+                    $estado ="Aberto";
+                     break;
+            }
+        }
+
+        return view('Pedido.index')->with('pedidos', $pedidos)->with('tipoProdutos',$tipoProdutos)->with('produtos', $produtos)->with('enderecos', $enderecos)->with('produtosPedido', $produtosPedido)->with('totalPedido', $totalPedido)->with('estado', $estado);
 
         
-        return view('Pedido.index');
     }
 
     /**
@@ -27,7 +97,7 @@ class PedidoController extends Controller
      */
     public function create()
     {
-        //
+       
     }
 
     /**
@@ -36,9 +106,63 @@ class PedidoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $endereco_id)
     {
-        //
+         // Pega o id do usuario logado
+         $user_id = 1;
+
+         // Verificar se o conteudo da variavel $endereco_id é nulo ( se a variavel foi definida)
+         if(isset($endereco_id) && $endereco_id != 'null'){
+            $endereco = Endereco::find($endereco_id);
+
+            //Verifico se foi encontrado algo e se o que foi encontrado pertence ao usuário logado
+            if($endereco && $endereco->Users_id == $user_id){
+                $pedido = new Pedido();
+                $pedido->dataEHora = Carbon::now()->toDateTimeString();
+                $pedido->status = "A";
+                $pedido->Users_id = $user_id;
+                $pedido->Enderecos_id = $endereco_id;
+                try {
+                    $pedido->save();
+                } catch (\Throwable $th) {
+                    $response['success'] = false;
+                    $response['message'] = "Erro ao salvar o pedido.";
+                    $response['return'] = [];
+                    return response()->json($response, 507);
+                }
+
+
+                $pedidos = Pedido::where('Users_id', $user_id)->orderBy('id', 'DESC')->get();
+
+                $response['success'] = true;
+                $response['message'] = "Pedido criado com sucesso.";
+                $response['return'] = $pedidos;
+                return response()->json($response, 201);
+            }
+            $response['success'] = false;
+            $response['message'] = "Endereço não pertence ao usuário.";
+            $response['return'] = [];
+            return response()->json($response, 403);
+        }
+        $pedido = new Pedido();
+        $pedido->dataEHora = Carbon::now()->toDateTimeString();
+        $pedido->status = "A";
+        $pedido->Users_id = $user_id;
+        $pedido->Enderecos_id = null;
+        try {
+            $pedido->save();
+        } catch (\Throwable $th) {
+            $response['success'] = false;
+            $response['message'] = "Erro ao salvar o pedido.";
+            $response['return'] = [];
+            return response()->json($response, 507);
+        }
+        $pedidos = Pedido::where('Users_id', $user_id)->orderBy('id', 'DESC')->get();
+
+        $response['success'] = true;
+        $response['message'] = "Pedido criado com sucesso.";
+        $response['return'] = $pedidos;
+        return response()->json($response, 201);
     }
 
     /**

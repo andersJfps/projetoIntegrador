@@ -22,25 +22,28 @@
             <div class="col-lg-4"> 
                 <div class="row">
                     <div class="col-5">
-
                         <a href="#" class="btn btn-primary w-100">Voltar</a>
                     </div>
 
-                    <form class="col-7" action="#" method="POST">
+                    <form id="idFormNovoPedido" class="col-7" method="POST" action="#">
                         @csrf
-                        <input type="submit" class="btn btn-primary w-100" value="Novo Pedido">
+                        <input type="submit" class="btn btn-primary w-100" value="Novo Pedido" readonly>
                     </form>
     
                 </div>
 
                 <div id="list-pedidos" class="list-group my-3">
-                    <a href="#" class="list-group-item list-group-item-action active " data-toggle="list">Pedido 7</a>
-                    <a href="#" class="list-group-item list-group-item-action " data-toggle="list">Pedido 6</a>
-                    <a href="#" class="list-group-item list-group-item-action " data-toggle="list">Pedido 5</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-toggle="list">Pedido 4</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-toggle="list">Pedido 3</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-toggle="list">Pedido 2</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-toggle="list">Pedido 1</a>
+
+                    @foreach ($pedidos as $pedido)
+
+                        @if ($loop->first)
+                        <a href="" class="list-group-item list-group-item-action active" data-toggle="list" value={{$pedido->id}}>Pedido {{$pedido->id}}</a>
+                        
+                        @else
+                        <a href="" class="list-group-item list-group-item-action" data-toggle="list" value={{$pedido->id}}>Pedido {{$pedido->id}}</a>
+                        @endif
+
+                    @endforeach
                   </div>
     
             </div>
@@ -53,10 +56,13 @@
                 <form action="#" method="POST">
                     @csrf
                     <div class="form-group">
+
                         <select class="form-control">
-                          <option>Pizza</option>
-                          <option>Suco</option>
-                          <option>Cerveja</option>
+
+                            @foreach ($tipoProdutos as $tipoProduto)
+                                <option value={{$tipoProduto->id}}>{{$tipoProduto->descricao}}</option>
+                            @endforeach
+
                         </select>
                       </div>  
                 </form>
@@ -66,8 +72,11 @@
                     @csrf
                     <div class="form-group">
                         <select class="form-control">
-                          <option>Pepperoni</option>
-                          <option>Quatro Queijos</option>
+
+                            @foreach ($produtos as $produto)
+                            <option value={{$produto->id}}>{{$produto->nome}}</option>
+                            @endforeach
+
                         </select>
                       </div>  
                 </form>
@@ -84,9 +93,25 @@
                  <form action="#" method="POST">
                     @csrf
                     <div class="form-group">
-                        <select class="form-control">
-                          <option>Rua X</option>
-                          <option>Rua Y</option>
+                        <select id="idSelectEndereco" class="form-control">
+
+                            @foreach ($enderecos as $endereco)
+
+                                <option value={{$endereco->id}} >{{$endereco->logradouro}}, Nº {{$endereco->numero}}. {{$endereco->bairro}} 
+                                    
+                                @if ($endereco->complemento)
+                                    . {{$endereco->complemento}}
+                                @endif
+
+                                </option>
+
+                               
+
+                            @endforeach
+                                <option value="null">Retirar no local</option>
+
+                          {{-- <option>Rua X</option>
+                          --}}
                         </select>
                       </div>  
                 </form>
@@ -105,41 +130,29 @@
             <div class="col-lg-4">
 
                 <div class="form-group">
-                    <input type="text" id="idTextState" class="text-center form-control my-3" value="Estado: Aberto">
+                    <input type="text" id="idTextState" class="text-center form-control my-3" value="Estado: {{$estado}}" readonly>
                   </div>
 
                 <div id="list-produtos" class="list-group my-3">
-                    <span href="#" class="list-group-item " >
-                        Pizza - Pepperoni - 1x
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash icons-list-produtos" viewBox="0 0 16 16">
-                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                          </svg>
-                    </span>
-                    
-                    <span href="#" class="list-group-item " >
-                        Suco - Laranja - 2x 
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash icons-list-produtos" viewBox="0 0 16 16">
-                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                          </svg>
-                    </span>
 
-                    <span href="#" class="list-group-item " data-toggle="list">
-                        Cerveja - Skol Lata -  3x
+                    @foreach ($produtosPedido as $produtoPedido)
+                    <span href="#" class="list-group-item " value1={{$produtoPedido->Pedidos_id}}  value2={{$produtoPedido->Produtos_id}}>
+                        
+                       {{$produtoPedido->descricao}} - {{$produtoPedido->nome}} - {{$produtoPedido->quantidade}}x
+
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash icons-list-produtos" viewBox="0 0 16 16">
                             <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                             <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                           </svg>
                     </span>
-
+                    @endforeach
                   </div>
 
                   <div class="input-group">
                     <input type="text" class="form-control" value="Valor Total:">
                     <div class="input-group-append">
                       <span class="input-group-text">R$</span>
-                      <span class="input-group-text">0.00</span>
+                      <span class="input-group-text">{{$totalPedido}}</span>
                     </div>
                   </div>
             </div>
